@@ -1,4 +1,4 @@
-package com.auth.user_management.configs;
+package com.auth.user_management.constants;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

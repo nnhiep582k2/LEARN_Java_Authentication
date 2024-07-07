@@ -1,15 +1,16 @@
 package com.auth.user_management.controllers;
 
+import com.auth.user_management.constants.AppCode;
+import com.auth.user_management.dtos.ServiceResponse;
 import com.auth.user_management.dtos.UserResponse;
 import com.auth.user_management.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,13 +30,19 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Has no permission")
     })
     @SecurityRequirement(name = "Bearer Token")
-    public ResponseEntity<List<UserResponse>> get() {
+    public ResponseEntity<ServiceResponse<UserResponse>> get() {
         try {
             List<UserResponse> users = userService.get();
-            return ResponseEntity.ok(users);
+            return ResponseEntity.ok(ServiceResponse.<UserResponse>builder()
+                    .pageData(users)
+                    .code(AppCode.Success)
+                    .build());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body(null);
+            return ResponseEntity.internalServerError().body(ServiceResponse.<UserResponse>builder()
+                    .pageData(null)
+                    .code(AppCode.ServerError)
+                    .build());
         }
     }
 
@@ -46,17 +53,26 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Bad credentials")
     })
     @SecurityRequirement(name = "Bearer Token")
-    public ResponseEntity<UserResponse> get(@PathVariable Integer id) {
+    public ResponseEntity<ServiceResponse<UserResponse>> get(@PathVariable Integer id) {
         try {
             UserResponse user = userService.get(id);
             if (user != null) {
-                return ResponseEntity.ok(user);
+                return ResponseEntity.ok(ServiceResponse.<UserResponse>builder()
+                        .data(user)
+                        .code(AppCode.Success)
+                        .build());
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ServiceResponse.<UserResponse>builder()
+                        .data(null)
+                        .code(AppCode.NotFound)
+                        .build());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body(null);
+            return ResponseEntity.internalServerError().body(ServiceResponse.<UserResponse>builder()
+                    .data(null)
+                    .code(AppCode.ServerError)
+                    .build());
         }
     }
 
@@ -67,17 +83,26 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Bad credentials")
     })
     @SecurityRequirement(name = "Bearer Token")
-    public ResponseEntity<Boolean> delete(@PathVariable Integer id) {
+    public ResponseEntity<ServiceResponse<Boolean>> delete(@PathVariable Integer id) {
         try {
             boolean isSuccess = userService.delete(id);
             if (isSuccess) {
-                return ResponseEntity.ok(true);
+                return ResponseEntity.ok(ServiceResponse.<Boolean>builder()
+                        .data(true)
+                        .code(AppCode.Success)
+                        .build());
             } else {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ServiceResponse.<Boolean>builder()
+                        .data(false)
+                        .code(AppCode.NotFound)
+                        .build());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body(false);
+            return ResponseEntity.internalServerError().body(ServiceResponse.<Boolean>builder()
+                    .data(false)
+                    .code(AppCode.ServerError)
+                    .build());
         }
     }
 }
