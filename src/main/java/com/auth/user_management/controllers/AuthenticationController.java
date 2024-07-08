@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "200", description = "Register successfully"),
             @ApiResponse(responseCode = "500", description = "Server error")
     })
-    public ResponseEntity<ServiceResponse<UserResponse>> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<ServiceResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest request) {
         UserResponse userResponse = authenticationService.register(request);
         return ResponseEntity.ok(ServiceResponse.<UserResponse>builder()
                 .data(userResponse)
@@ -42,7 +43,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "200", description = "Login successfully"),
             @ApiResponse(responseCode = "403", description = "Bad credentials")
     })
-    public ResponseEntity<ServiceResponse<AuthenticationResponse>> authenticate(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<ServiceResponse<AuthenticationResponse>> authenticate(@Valid @RequestBody AuthenticationRequest request) {
         AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
         return ResponseEntity.ok(ServiceResponse.<AuthenticationResponse>builder()
                 .data(authenticationResponse)
@@ -57,7 +58,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "200", description = "Refresh successfully"),
             @ApiResponse(responseCode = "500", description = "Server error")
     })
-    public ResponseEntity<ServiceResponse<String>> refreshToken(@RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<ServiceResponse<String>> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         String newRefreshToken = authenticationService.refreshToken(request);
         if (newRefreshToken.isEmpty()) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ServiceResponse.<String>builder()
@@ -80,7 +81,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "500", description = "Server error")
     })
     public ResponseEntity<ServiceResponse<Boolean>> logout(@RequestHeader("Authorization") String authHeader,
-                                                           @RequestBody String email) {
+                                                           @Valid @RequestBody String email) {
         try {
             authenticationService.logout(authHeader, email);
             return ResponseEntity.ok(ServiceResponse.<Boolean>builder()

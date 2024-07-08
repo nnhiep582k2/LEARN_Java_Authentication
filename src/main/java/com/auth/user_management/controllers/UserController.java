@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +54,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Bad credentials")
     })
     @SecurityRequirement(name = "Bearer Token")
-    public ResponseEntity<ServiceResponse<UserResponse>> get(@PathVariable Integer id) {
+    public ResponseEntity<ServiceResponse<UserResponse>> get(@Valid @PathVariable Integer id) {
         try {
             UserResponse user = userService.get(id);
             if (user != null) {
@@ -83,7 +84,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Bad credentials")
     })
     @SecurityRequirement(name = "Bearer Token")
-    public ResponseEntity<ServiceResponse<Boolean>> delete(@PathVariable Integer id) {
+    public ResponseEntity<ServiceResponse<Boolean>> delete(@Valid @PathVariable Integer id) {
         try {
             boolean isSuccess = userService.delete(id);
             if (isSuccess) {
